@@ -136,7 +136,6 @@ def post_parameters_by_user(user):
         parameter['Operation'] = 'SetParam'
         parameter['Status'] = status
         parameters.append(parameter)
-
     return {'Result': parameters}
 
 
