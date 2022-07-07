@@ -10,6 +10,17 @@ Flask==2.1.2
 Flask-RESTful==0.3.9
 Flask-SQLAlchemy==2.5.1
 
+### Для запуска в dev-режиме (Windows) в папке с работой:
+
+    python -m venv venv
+    source venv/Scripts/activate
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+    
+    python app.py
+
+API - запросы будут доступны по адресу: http://localhost:8000/
+
 ## Примеры запросов:
 
 ###Для добавления и обновления параметра необходим 
