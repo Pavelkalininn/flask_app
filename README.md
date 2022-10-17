@@ -1,16 +1,16 @@
-# Сервер хранения параметров пользователя
+# User Parameter Storage Server
 
 
-### Описание
-API для создания и просмотра параметров по имени юзера, имени параметра, типу
+### Description
+API for creating and viewing parameters by user name, parameter name, type
 
-### Технологии
+### Technologies
 Python 3.7.9
 Flask==2.1.2
 Flask-RESTful==0.3.9
 Flask-SQLAlchemy==2.5.1
 
-### Для запуска в dev-режиме (Windows) в папке с работой:
+### To run in dev mode (Windows) in the work folder:
 
     python -m venv venv
     source venv/Scripts/activate
@@ -19,35 +19,23 @@ Flask-SQLAlchemy==2.5.1
     
     python app.py
 
-API - запросы будут доступны по адресу: http://localhost:8000/
+API requests will be available at: http://localhost:8000/
 
-## Примеры запросов:
+## Request examples:
 
-###Для добавления и обновления параметра необходим 
+###To add and update a parameter, you need
 
-POST запрос на адрес /api/parameters/<user>/<name>/<type>/ со словарем в теле запроса:
+POST request at /api/parameters/<user>/<name>/<type>/  with dictionary in request body:
 
     {
         "value": "Значение параметра"
     }
 
-###Для получения параметра:
+###To get the parameter:
 
-GET запрос на адрес /api/parameters/<user>/<name>/<type>/ со словарем в теле запроса:
+GET request at /api/parameters/<user>/<name>/<type>/ with dictionary in request body:
 
-Пример ответа:
-
-    {   
-        "name": "имя параметра",
-        "type": "тип параметра",
-        "value": "Значение параметра"
-    }
-
-###Получить все параметры юзера:
-
-GET запрос на адрес /api/parameters/<user>/
-
-Пример ответа:
+Answer:
 
     {   
         "name": "имя параметра",
@@ -55,36 +43,47 @@ GET запрос на адрес /api/parameters/<user>/
         "value": "Значение параметра"
     }
 
-### Добавление параметров через json-API:
+###Get all user parameters:
 
-POST запрос на адрес /api/<user>/ в формате:
+GET request at  /api/parameters/<user>/
+
+Answer:
+
+    {   
+        "name": "имя параметра",
+        "type": "тип параметра",
+        "value": "Значение параметра"
+    }
+
+### Adding parameters via the json API:
+
+POST request at/api/<user>/:
 
     {
         "Query":
             [
                 {
                     "Operation":"SetParam",
-                    "Name": "Имя параметра",
-                    "Type": "Тип параметра",
-                    "Value":"Значение параметра"
+                    "Name": "parameter name",
+                    "Type": "parameter type",
+                    "Value":"parameter value"
                 }
             ]
     }
 
-Пример ответа:
+Answer:
 
     {
         "Result":
             [
                 {
                     "Operation":"SetParam",
-                    "name": "Имя параметра",
-                    "type": "Тип параметра",
+                    "name": "parameter name",
+                    "type": "parameter type",
                     "Status":"OK|ERROR"
                 }
             ]
     }
 
 
-### Автор
-Паша Калинин 
+### Author Pavel Kalinin
