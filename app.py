@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.debug = False
 
 api = Api(app)
 db.init_app(app)
@@ -21,13 +22,11 @@ def get_user():
     if request.method == 'GET':
         users = UsersModel.query.all()
         return {'Users': list(user.json() for user in users)}
-    else:
-        data = request.get_json()
-
-        new_user = UsersModel(data['name'], data['username'])
-        db.session.add(new_user)
-        db.session.commit()
-        return new_user.json(), 201
+    data = request.get_json()
+    new_user = UsersModel(data['name'], data['username'])
+    db.session.add(new_user)
+    db.session.commit()
+    return new_user.json(), 201
 
 
 @app.route('/api/parameters/<user>/<name>/<type>/', methods=['GET', 'POST'])
@@ -46,24 +45,22 @@ def get_parameters(user, name, type):
                 parameter.value = int(parameter.value)
             return parameter.json()
         return [], 204
-
+    data = request.get_json()
+    parameter = ParametersModel.query.filter_by(
+        user=user).filter_by(name=name).filter_by(type=type).first()
+    value = data.get("value")
+    if type == 'int':
+        if not value.isnumeric():
+            return {'message': 'wrong type of value'}, 400
+        value = int(value)
+    if parameter:
+        parameter.value = value
     else:
-        data = request.get_json()
-        parameter = ParametersModel.query.filter_by(
-            user=user).filter_by(name=name).filter_by(type=type).first()
-        value = data.get("value")
-        if type == 'int':
-            if not value.isnumeric():
-                return {'message': 'wrong type of value'}, 400
-            value = int(value)
-        if parameter:
-            parameter.value = value
-        else:
-            parameter = ParametersModel(
-                user=user, name=name, type=type, value=value)
-        db.session.add(parameter)
-        db.session.commit()
-        return parameter.json()
+        parameter = ParametersModel(
+            user=user, name=name, type=type, value=value)
+    db.session.add(parameter)
+    db.session.commit()
+    return parameter.json()
 
 
 @app.route('/api/parameters/<user>/<name>/', methods=['GET'])
@@ -71,18 +68,16 @@ def get_parameters_without_type(user, name):
     current_user = UsersModel.query.filter_by(username=user).all()
     if not current_user:
         return {'message': 'user not found'}, 404
-
-    if request.method == "GET":
-        parameters = ParametersModel.query.filter_by(
-            user=user).filter_by(name=name).all()
-        list_parameters = []
-        if parameters:
-            for parameter in parameters:
-                if parameter.type == 'int':
-                    parameter.value = int(parameter.value)
-                list_parameters.append(parameter.json())
-            return {'Parameters': list_parameters}
-        return {'message': 'parameter not found'}, 404
+    parameters = ParametersModel.query.filter_by(
+        user=user).filter_by(name=name).all()
+    list_parameters = []
+    if parameters:
+        for parameter in parameters:
+            if parameter.type == 'int':
+                parameter.value = int(parameter.value)
+            list_parameters.append(parameter.json())
+        return {'Parameters': list_parameters}
+    return {'message': 'parameter not found'}, 404
 
 
 @app.route('/api/parameters/<user>/', methods=['GET'])
@@ -91,7 +86,8 @@ def get_parameters_by_user(user):
     if not current_user:
         return {'message': 'user not found'}, 404
     parameters = ParametersModel.query.filter_by(
-        user=user).all()
+        user=user
+    ).all()
     list_parameters = []
     if parameters:
         for parameter in parameters:
@@ -126,7 +122,11 @@ def post_parameters_by_user(user):
             value = int(value)
 
         parameter = ParametersModel(
-            user=user, name=name, type=type, value=value)
+            user=user,
+            name=name,
+            type=type,
+            value=value
+        )
 
         db.session.add(parameter)
         db.session.commit()
@@ -139,6 +139,5 @@ def post_parameters_by_user(user):
     return {'Result': parameters}
 
 
-app.debug = True
 if __name__ == '__main__':
     app.run(host='localhost', port=8000)
