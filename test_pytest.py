@@ -1,5 +1,4 @@
 
-
 @pytest.fixture()
 def app():
     app = create_app()
@@ -28,7 +27,8 @@ def test_edit_user(client):
     assert response.status_code == 200
 
     request = self.app.get('/api/users/')
-    assert request.data, {"Users":
+    assert request.data, {
+        "Users":
         [
             {
                 "name": "name",
